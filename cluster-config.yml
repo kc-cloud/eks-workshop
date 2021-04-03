@@ -1,0 +1,21 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: kCluster
+  region: us-east-1
+  version: "1.18"
+vpc:
+  subnets:
+    public:
+      us-east-1a: { id: subnet-fbd495b6 }
+      us-east-1b: { id: subnet-a1f845fe }
+      us-east-1c: { id: subnet-47813021 }
+nodeGroups:
+  - name: web-servers
+    minSize: 1
+    maxSize: 2
+    desiredCapacity: 1
+    volumeSize: 20
+    instanceType: t3.small
+    ssh:
+      enableSsm: true
