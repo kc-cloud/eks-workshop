@@ -57,3 +57,16 @@ kubectl -n kube-system \
 kubectl apply -f nginx-autoscale-demo.yml
 ### Increase the number of pods .. which will end-up signaling autoscale to scale-out nodes
 kubectl scale --replicas=10 deployment/nginx-to-scaleout
+
+# RBAC
+## 1. Create a namespace
+## 2. Deploy app to the namespace
+## 3. create IAM user, obtain the access key and secrets key
+## 4. get aws-auth into a file
+kubectl get configmap -n kube-system aws-auth -o yaml > aws-auth.yaml
+## 5. add a user map to map the aws user to the k8s user
+### data:
+###   mapUsers: |
+###     - userarn: arn:aws:iam::${ACCOUNT_ID}:user/rbac-user
+###       username: rbac-user
+## 6. This user doesnt have any permission within the k8s cluster

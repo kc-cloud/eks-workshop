@@ -1,0 +1,35 @@
+aws:
+  - iam-role: (iam user/group assumable)
+    - k8sAdmin
+    - k8sDev
+    - k8sInteg
+  - iam-group:
+    - k8sAdmin
+      - user1
+    - k8sDev
+      - user2
+    - k8sInteg
+      - user3
+
+k8s:
+  - aws-auth: (iamidentitymapping)
+    - admin-user
+      k8sAdmin
+    - dev-user
+      k8sDev
+    - integ-user
+      k8sInteg
+  - Role:
+    - admin-role
+    - dev-role
+    - integ-role
+  - RoleBinding:
+    - admin-role
+      admin-user 
+    - dev-role
+      dev-user
+    - integ-role
+      integ-user
+      
+  
+  
