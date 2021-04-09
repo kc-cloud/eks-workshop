@@ -16,6 +16,6 @@ nodeGroups:
     maxSize: 2
     desiredCapacity: 1
     volumeSize: 20
-    instanceType: t3.small
+    instanceType: t3.medium
     ssh:
       enableSsm: true

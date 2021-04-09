@@ -1,0 +1,48 @@
+- create RDS security group
+- create the POD security group
+- find out the Node Group security group
+- allow POD_SG to connect to NODE_GROUP_SG using TCP 53
+- allow POD_SG to connect to NODE_GROUP_SG using UDP 53
+- allow POD_SG to connect to the RDS
+- create a db subnet group with the public subnets
+- create RDS Postgresql instance
+
+# allow my ip to connect to RDS
+aws ec2 authorize-security-group-ingress \
+    --group-id ${RDS_SG} \
+    --protocol tcp \
+    --port 5432 \
+    --cidr 76.119.114.67/32
+
+export PUBLIC_SUBNETS_ID=$(aws ec2 describe-subnets --filter Name=availability-zone,Values=us-east-1a,us-east-1b,us-east-1c --query 'Subnets[*].SubnetId' | jq -c .)
+
+aws rds create-db-subnet-group \
+    --db-subnet-group-name rds-eksworkshop \
+    --db-subnet-group-description rds-eksworkshop \
+    --subnet-ids ${PUBLIC_SUBNETS_ID}
+
+export RDS_PASSWORD=sT6wYk4jLz
+# create RDS Postgresql instance
+aws rds create-db-instance \
+    --db-instance-identifier rds-eksworkshop \
+    --db-name eksworkshop \
+    --db-instance-class db.t3.micro \
+    --engine postgres \
+    --db-subnet-group-name rds-eksworkshop \
+    --vpc-security-group-ids $RDS_SG \
+    --master-username eksworkshop \
+    --publicly-accessible \
+    --master-user-password $RDS_PASSWORD \
+    --backup-retention-period 0 \
+    --allocated-storage 20
+# verify the database is created 
+aws rds describe-db-instances \
+    --db-instance-identifier rds-eksworkshop \
+    --query "DBInstances[].DBInstanceStatus" \
+    --output text
+  # get RDS endpoint
+export RDS_ENDPOINT=$(aws rds describe-db-instances \
+    --db-instance-identifier rds-eksworkshop \
+    --query 'DBInstances[0].Endpoint.Address' \
+    --output text)
+
